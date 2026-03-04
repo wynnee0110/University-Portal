@@ -61,7 +61,8 @@ const getEnvVar = (key: string): string => {
         console.warn(`Missing environment variable: ${key}`);
         return "";
     }
-    return value;
+    // Strip trailing slash so paths like `${url}/stats` never produce `//stats`
+    return String(value).replace(/\/+$/, "");
 };
 
 export const CLOUDINARY_UPLOAD_URL = getEnvVar("VITE_CLOUDINARY_UPLOAD_URL");
