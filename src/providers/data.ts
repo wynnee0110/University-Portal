@@ -1,6 +1,7 @@
 import { BACKEND_BASE_URL } from "@/constants";
 import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 import type { HttpError } from "@refinedev/core";
+import { CreateResponse } from "@/types";
 
 // Backend response shapes
 type BackendListResponse<T = Record<string, unknown>> = {
@@ -81,6 +82,17 @@ const options: CreateDataProviderOptions = {
       // backend uses `totalItems`; fall back to `total`
       const total = p?.totalItems ?? p?.total;
       return total !== undefined ? +total : (payload.subjects ?? payload.users ?? payload.data ?? []).length;
+    },
+  },
+  create: {
+    getEndpoint: ({ resource }) => resource,
+    buildBodyParams: async ({ variables }) => variables,
+    mapResponse: async (response) => {
+      const json: CreateResponse = await response.json();
+      if (!response.ok) {
+        throw await buildHttpError(response);
+      }
+      return json.data ?? json;
     },
   },
 };
