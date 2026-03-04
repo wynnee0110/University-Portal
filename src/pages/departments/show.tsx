@@ -10,13 +10,14 @@ const DepartmentShow = () => {
     const { query: { data, isLoading } } = useShow<DepartmentDetail>();
     const record = data?.data;
 
-    const subjectsQuery = useList<Subject>({
+    const { query: subjectsQuery } = useList<Subject>({
         resource: "subjects",
         filters: [{ field: "department", operator: "eq", value: record?.id }],
         queryOptions: { enabled: !!record?.id },
-        pagination: { pageSize: 100 } // Get all for display
-    }) as any;
-    const subjectsData = subjectsQuery?.data;
+        pagination: { pageSize: 100 },
+    });
+    const subjects = subjectsQuery?.data?.data ?? [];
+    const subjectsLoading = subjectsQuery?.isLoading ?? false;
 
     if (isLoading || !record) return <div className="p-8">Loading...</div>;
 
@@ -57,14 +58,20 @@ const DepartmentShow = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {!subjectsData?.data || subjectsData.data.length === 0 ? (
+                                    {subjectsLoading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={2} className="text-center text-muted-foreground h-24">
+                                                Loading subjects...
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : subjects.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={2} className="text-center text-muted-foreground h-24">
                                                 No subjects found.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        subjectsData?.data?.map((subject: any) => (
+                                        subjects.map((subject: any) => (
                                             <TableRow key={subject.id}>
                                                 <TableCell><Badge variant="outline">{subject.code}</Badge></TableCell>
                                                 <TableCell>{subject.name}</TableCell>

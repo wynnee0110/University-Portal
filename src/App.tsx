@@ -21,7 +21,7 @@ import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
 import SubjectsEdit from "./pages/subjects/Edit";
 import SubjectsShow from "./pages/subjects/Show";
-import { GraduationCap, Users, Building2 } from "lucide-react";
+import { GraduationCap, Users, Building2, ClipboardList } from "lucide-react";
 import ClassesList from "./pages/classes/list";
 import ClassesCreate from "./pages/classes/create";
 import ClassesShow from "./pages/classes/show";
@@ -33,6 +33,7 @@ import DepartmentShow from "./pages/departments/show";
 import UserList from "./pages/users/list";
 import UserEdit from "./pages/users/edit";
 import UserShow from "./pages/users/show";
+import EnrollmentsList from "./pages/enrollments/list";
 
 function App() {
   return (
@@ -83,6 +84,10 @@ function App() {
                   edit: '/users/edit/:id',
                   show: '/users/show/:id',
                   meta: { label: 'Users', icon: <Users /> }
+                },
+                {
+                  name: "enrollments", list: '/enrollments',
+                  meta: { label: 'Enrollments', icon: <ClipboardList /> }
                 }
               ]}
 
@@ -117,6 +122,9 @@ function App() {
                     <Route index element={<UserList />} />
                     <Route path="edit/:id" element={<UserEdit />} />
                     <Route path="show/:id" element={<UserShow />} />
+                  </Route>
+                  <Route path="enrollments">
+                    <Route index element={<EnrollmentsList />} />
                   </Route>
                 </Route>
               </Routes>
