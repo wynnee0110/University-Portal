@@ -1,5 +1,6 @@
 import { BACKEND_BASE_URL } from "@/constants";
 import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
+import type { HttpError } from "@refinedev/core";
 
 // Backend response shapes
 type BackendListResponse<T = Record<string, unknown>> = {
@@ -13,6 +14,29 @@ type BackendListResponse<T = Record<string, unknown>> = {
     itemsPerPage?: number;
   };
 };
+
+if (!BACKEND_BASE_URL) {
+  throw new Error("BACKEND_BASE_URL is required");
+}
+
+const buildHttpError = async (response: Response): Promise<HttpError> => {
+  let message = 'request failed';
+
+  try {
+    const payload = await response.json() as { message?: string };
+    if (payload?.message) message = payload.message;
+
+  } catch (error) {
+
+  }
+
+  return {
+    message,
+    statusCode: response.status,
+
+  }
+
+}
 
 const options: CreateDataProviderOptions = {
   getList: {
@@ -39,6 +63,9 @@ const options: CreateDataProviderOptions = {
     },
 
     mapResponse: async (response) => {
+      if (!response.ok) {
+        throw await buildHttpError(response);
+      }
       const payload: BackendListResponse = await response.json();
       // backend returns `subjects` key; fall back to `data` for other resources
       return (payload.subjects ?? payload.data ?? []) as object[];
