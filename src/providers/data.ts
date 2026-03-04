@@ -1,7 +1,7 @@
 import { BACKEND_BASE_URL } from "@/constants";
 import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest";
 import type { HttpError } from "@refinedev/core";
-import { CreateResponse } from "@/types";
+import { CreateResponse, GetOneResponse } from "@/types";
 
 // Backend response shapes
 type BackendListResponse<T = Record<string, unknown>> = {
@@ -39,6 +39,8 @@ const buildHttpError = async (response: Response): Promise<HttpError> => {
   }
 
 }
+
+
 
 const options: CreateDataProviderOptions = {
   getList: {
@@ -100,6 +102,18 @@ const options: CreateDataProviderOptions = {
       return json.data ?? json;
     },
   },
+
+  getOne: {
+    getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+    mapResponse: async (response) => {
+      const json: GetOneResponse = await response.json();
+      if (!response.ok) {
+        throw await buildHttpError(response);
+      }
+      return json.data ?? json;
+    },
+
+  }
 };
 
 const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options);

@@ -22,6 +22,7 @@ import SubjectsCreate from "./pages/subjects/Create";
 import { GraduationCap } from "lucide-react";
 import ClassesList from "./pages/classes/list";
 import ClassesCreate from "./pages/classes/create";
+import ClassesShow from "./pages/classes/show.tsx";
 
 function App() {
   return (
@@ -61,6 +62,9 @@ function App() {
                   meta: {label:'Classes', icon: <GraduationCap />}
                   
                 },
+                
+
+                
               ]}
 
             >
@@ -79,8 +83,9 @@ function App() {
                 <Route path ="classes">
                   <Route index element={<ClassesList />} />
                   <Route path="create" element={<ClassesCreate />} />
+                  <Route path="show/:id" element={<ClassesShow />} />
                 </Route>
-                
+   
                 
               </Route>
               </Routes>
