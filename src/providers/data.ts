@@ -5,6 +5,7 @@ import type { HttpError } from "@refinedev/core";
 // Backend response shapes
 type BackendListResponse<T = Record<string, unknown>> = {
   subjects?: T[];
+  users?: T[];
   data?: T[];
   pagination?: {
     currentPage?: number;
@@ -54,7 +55,10 @@ const options: CreateDataProviderOptions = {
         if (resource === 'subjects') {
           if (field === 'department') params.department = value;
           if (field === 'name' || field === 'code') params.search = value;
-
+        }
+        if (resource === 'users') {
+          if (field === 'role') params.role = value;
+          if (field === 'name') params.search = value;
         }
 
 
@@ -67,8 +71,8 @@ const options: CreateDataProviderOptions = {
         throw await buildHttpError(response);
       }
       const payload: BackendListResponse = await response.json();
-      // backend returns `subjects` key; fall back to `data` for other resources
-      return (payload.subjects ?? payload.data ?? []) as object[];
+      // backend returns resource-keyed arrays; fall back to `data`
+      return (payload.subjects ?? payload.users ?? payload.data ?? []) as object[];
     },
 
     getTotalCount: async (response) => {
@@ -76,7 +80,7 @@ const options: CreateDataProviderOptions = {
       const p = payload.pagination;
       // backend uses `totalItems`; fall back to `total`
       const total = p?.totalItems ?? p?.total;
-      return total !== undefined ? +total : (payload.subjects ?? payload.data ?? []).length;
+      return total !== undefined ? +total : (payload.subjects ?? payload.users ?? payload.data ?? []).length;
     },
   },
 };

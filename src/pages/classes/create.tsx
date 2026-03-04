@@ -24,7 +24,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
-import { Loader2 } from "lucide-react";
+import { Loader2, RollerCoaster } from "lucide-react";
+import { useList } from "@refinedev/core";
+import { Subject, User } from "@/types";
 
 
 const Create = () => {
@@ -55,29 +57,32 @@ const Create = () => {
         }
     };
 
-    const teachers = [
-        {
-            id: 1,
-            name: "John Doe",
+    const { query: subjectsQuery } = useList<Subject>({
+        resource: "subjects",
+        pagination: {
+            pageSize: 100
         },
-        {
-            id: 2,
-            name: "Jane Doe",
-        },
-    ];
 
-    const subjects = [
-        {
-            id: 1,
-            name: "Math",
-            code: "MATH",
+    });
+
+    const { query: teachersQuery } = useList<User>({
+        resource: "users",
+        filters: [{
+            field: 'role', operator: 'eq', value: 'teacher'
         },
-        {
-            id: 2,
-            name: "English",
-            code: "ENG",
+
+        ],
+        pagination: {
+            pageSize: 100
         },
-    ];
+
+    });
+
+    const subjects = subjectsQuery.data?.data || [];
+    const subjectsLoading = subjectsQuery.isLoading;
+    const teachers = teachersQuery.data?.data || [];
+    const teachersLoading = teachersQuery.isLoading;
+
     const bannerPublicId = form.watch("bannerCldPubId");
     const setBannerImage = (file: any, fieldOnChange: (val: string) => void) => {
         if (file) {
@@ -178,7 +183,8 @@ const Create = () => {
                                                     onValueChange={(value) =>
                                                         field.onChange(Number(value))
                                                     }
-                                                    value={field.value?.toString()}
+                                                    value={field.value?.toString() ?? ""}
+                                                    disabled={subjectsLoading}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger className="w-full">
@@ -190,6 +196,7 @@ const Create = () => {
                                                             <SelectItem
                                                                 key={subject.id}
                                                                 value={subject.id.toString()}
+
                                                             >
                                                                 {subject.name} ({subject.code})
                                                             </SelectItem>
@@ -212,6 +219,7 @@ const Create = () => {
                                                 <Select
                                                     onValueChange={field.onChange}
                                                     value={field.value ?? ""}
+                                                    disabled={teachersLoading}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger className="w-full">
