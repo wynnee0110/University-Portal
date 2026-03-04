@@ -123,3 +123,39 @@ export type SignUpPayload = {
     imageCldPubId?: string;
     role: UserRole;
 };
+
+export type Enrollment = {
+    studentId: string;
+    classId: number;
+    student?: User;
+};
+
+export type DepartmentDetail = Department & {
+    code: string;
+    subjectCount?: number;
+    subjects?: Pick<Subject, 'id' | 'name' | 'code'>[];
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type Stats = {
+    overview: {
+        totalUsers: number;
+        totalClasses: number;
+        totalDepartments: number;
+        totalEnrollments: number;
+        totalSubjects: number;
+    };
+    usersByRole: { role: string; count: number }[];
+    classesByDepartment: { department: string; count: number }[];
+    capacityStatus: { label: string; value: number }[];
+    enrollmentTrends: { month: string; count: number }[];
+    recentActivity: {
+        id: number;
+        name: string;
+        status: string;
+        createdAt: string;
+        teacherName: string;
+        subjectName: string;
+    }[];
+};

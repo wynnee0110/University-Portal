@@ -23,24 +23,13 @@ if (!BACKEND_BASE_URL) {
 
 const buildHttpError = async (response: Response): Promise<HttpError> => {
   let message = 'request failed';
-
   try {
-    const payload = await response.json() as { message?: string };
-    if (payload?.message) message = payload.message;
-
-  } catch (error) {
-
-  }
-
-  return {
-    message,
-    statusCode: response.status,
-
-  }
-
-}
-
-
+    const payload = await response.json() as { message?: string; error?: string };
+    if (payload?.error) message = payload.error;
+    else if (payload?.message) message = payload.message;
+  } catch (_) { }
+  return { message, statusCode: response.status };
+};
 
 const options: CreateDataProviderOptions = {
   getList: {
@@ -67,39 +56,57 @@ const options: CreateDataProviderOptions = {
           if (field === 'name') params.search = value;
           if (field === 'subject') params.subject = value;
           if (field === 'teacher') params.teacher = value;
+          if (field === 'status') params.status = value;
         }
-
-
+        if (resource === 'departments') {
+          if (field === 'name') params.search = value;
+        }
+        if (resource === 'enrollments') {
+          if (field === 'classId') params.classId = value;
+        }
       });
       return params;
     },
 
     mapResponse: async (response) => {
-      if (!response.ok) {
-        throw await buildHttpError(response);
-      }
+      if (!response.ok) throw await buildHttpError(response);
       const payload: BackendListResponse = await response.json();
-      // backend returns resource-keyed arrays; fall back to `data`
       return (payload.subjects ?? payload.users ?? payload.data ?? []) as object[];
     },
 
     getTotalCount: async (response) => {
       const payload: BackendListResponse = await response.json();
       const p = payload.pagination;
-      // backend uses `totalItems`; fall back to `total`
       const total = p?.totalItems ?? p?.total;
       return total !== undefined ? +total : (payload.subjects ?? payload.users ?? payload.data ?? []).length;
     },
   },
+
   create: {
     getEndpoint: ({ resource }) => resource,
     buildBodyParams: async ({ variables }) => variables,
     mapResponse: async (response) => {
       const json: CreateResponse = await response.json();
-      if (!response.ok) {
-        throw await buildHttpError(response);
-      }
+      if (!response.ok) throw await buildHttpError(response);
       return json.data ?? json;
+    },
+  },
+
+  update: {
+    getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+    buildBodyParams: async ({ variables }) => variables,
+    mapResponse: async (response) => {
+      const json: GetOneResponse = await response.json();
+      if (!response.ok) throw await buildHttpError(response);
+      return json.data ?? json;
+    },
+  },
+
+  deleteOne: {
+    getEndpoint: ({ resource, id }) => `${resource}/${id}`,
+    mapResponse: async (response) => {
+      if (!response.ok) throw await buildHttpError(response);
+      return {};
     },
   },
 
@@ -107,13 +114,10 @@ const options: CreateDataProviderOptions = {
     getEndpoint: ({ resource, id }) => `${resource}/${id}`,
     mapResponse: async (response) => {
       const json: GetOneResponse = await response.json();
-      if (!response.ok) {
-        throw await buildHttpError(response);
-      }
+      if (!response.ok) throw await buildHttpError(response);
       return json.data ?? json;
     },
-
-  }
+  },
 };
 
 const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options);
