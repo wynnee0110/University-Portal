@@ -159,3 +159,9 @@ export type Stats = {
         subjectName: string;
     }[];
 };
+
+export type AIQueryResponse = {
+    action: string;
+    filters?: Record<string, unknown>;
+    data?: Record<string, unknown>;
+};

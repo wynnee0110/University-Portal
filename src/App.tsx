@@ -34,11 +34,14 @@ import UserList from "./pages/users/list";
 import UserEdit from "./pages/users/edit";
 import UserShow from "./pages/users/show";
 import EnrollmentsList from "./pages/enrollments/list";
+import AiQuery from "./pages/ai/query";
+
+
+
 
 function App() {
   return (
     <BrowserRouter>
-
       <RefineKbarProvider>
         <ThemeProvider>
           <DevtoolsProvider>
@@ -50,6 +53,10 @@ function App() {
                 syncWithLocation: true,
                 warnWhenUnsavedChanges: true,
                 projectId: "vPdjlZ-7VL2fg-PRJnaL",
+                title: { 
+      text: "University", 
+       // or any React node
+    },
               }}
               resources={[
                 {
@@ -89,6 +96,7 @@ function App() {
                   name: "enrollments", list: '/enrollments',
                   meta: { label: 'Enrollments', icon: <ClipboardList /> }
                 }
+                
               ]}
 
             >
@@ -125,6 +133,9 @@ function App() {
                   </Route>
                   <Route path="enrollments">
                     <Route index element={<EnrollmentsList />} />
+                  </Route>
+                  <Route path="ai">
+                    <Route index element={<AiQuery />} />
                   </Route>
                 </Route>
               </Routes>
