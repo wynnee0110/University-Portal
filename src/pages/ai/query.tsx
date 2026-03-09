@@ -4,7 +4,7 @@ import AiResultTable from '../../components/ai/AiResultTable';
 import { useAiQuery } from '../../hooks/useAiQuery';
 
 const AiQueryPage = () => {
-    const { data, loading, error, queryAI } = useAiQuery();
+    const { data, sqlQuery, loading, error, queryAI } = useAiQuery();
 
     return (
         <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-gray-50 to-white pt-12 pb-24 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
@@ -39,9 +39,29 @@ const AiQueryPage = () => {
                     </div>
                 )}
 
+            {/*    {!loading && !error && sqlQuery && (
+                    <div className="mt-8 mb-4 max-w-5xl mx-auto w-full text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="p-4 bg-gray-900 rounded-xl shadow-lg border border-gray-800">
+                            <div className="text-xs text-gray-400 mb-2 font-mono uppercase tracking-widest flex items-center justify-between">
+                                <span>Executed SQL</span>
+                                <span className="bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded text-[10px]">Gemini 2.5 Flash</span>
+                            </div>
+                            <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap break-words overflow-x-auto">
+                                {sqlQuery}
+                            </pre>
+                        </div>
+                    </div>
+                )}
+            */}
                 {!loading && !error && data && data.length > 0 && (
-                    <div className="mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="mt-4 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
                         <AiResultTable data={data} />
+                    </div>
+                )}
+
+                {!loading && !error && data && data.length === 0 && sqlQuery && (
+                    <div className="mt-8 text-center text-gray-500 font-medium">
+                        Query executed successfully, but returned no data.
                     </div>
                 )}
             </div>

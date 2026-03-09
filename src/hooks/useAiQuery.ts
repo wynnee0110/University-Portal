@@ -7,6 +7,7 @@ import { useState } from "react";
 export function useAiQuery() {
 
     const [data, setData] = useState<any[]>([]);
+    const [sqlQuery, setSqlQuery] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -16,6 +17,8 @@ export function useAiQuery() {
 
             setLoading(true);
             setError(null);
+            setSqlQuery(null);
+            setData([]);
 
             const res = await fetch("http://localhost:8000/api/ai/query", {
                 method: "POST",
@@ -30,7 +33,12 @@ export function useAiQuery() {
             }
 
             const result = await res.json();
-            setData(result);
+            if (result.success !== undefined) {
+                setData(result.data || []);
+                setSqlQuery(result.query || null);
+            } else {
+                setData(result);
+            }
 
         } catch (err: any) {
 
@@ -45,6 +53,7 @@ export function useAiQuery() {
 
     return {
         data,
+        sqlQuery,
         loading,
         error,
         queryAI
