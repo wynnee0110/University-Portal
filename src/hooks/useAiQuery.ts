@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BACKEND_BASE_URL } from "@/constants";
 
 /**
  * Custom hook for sending AI queries to the backend
@@ -20,7 +21,7 @@ export function useAiQuery() {
             setSqlQuery(null);
             setData([]);
 
-            const res = await fetch("http://localhost:8000/api/ai/query", {
+            const res = await fetch(`${BACKEND_BASE_URL}/ai/query`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
